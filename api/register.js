@@ -2,39 +2,24 @@ import bcrypt from "bcryptjs";
 import { sql } from "@vercel/postgres";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).send("Method not allowed");
-  }
+  if (req.method !== "POST") return res.status(405).send("Method not allowed");
 
-  let { email, password } = req.body;
+  let { username, password } = req.body;
+  if (!username || !password) return res.status(400).send("Missing username or password");
 
-  if (!email || !password) {
-    return res.status(400).send("Missing email or password");
-  }
+  username = username.trim().toLowerCase();
 
-  email = email.trim().toLowerCase();
-
-  if (password.length < 6) {
-    return res.status(400).send("Password too short");
-  }
+  if (password.length < 6) return res.status(400).send("Password too short");
 
   try {
     await sql`
-      INSERT INTO users (email, password_hash)
-      VALUES (${email}, ${await bcrypt.hash(password, 12)})
+      INSERT INTO users (username, password_hash)
+      VALUES (${username}, ${await bcrypt.hash(password, 12)})
     `;
-
-    return res.status(201).send("Account created successfully");
+    return res.status(201).json({ success: true, username });
   } catch (err) {
-    // 👇 THIS IS THE IMPORTANT PART
-    if (err.code === "23505") {
-      // unique_violation
-      return res.status(409).send("Account already exists");
-    }
-
+    if (err.code === "23505") return res.status(409).send("Username already exists");
     console.error("REGISTER ERROR:", err);
     return res.status(500).send("Server error");
   }
 }
-
-
