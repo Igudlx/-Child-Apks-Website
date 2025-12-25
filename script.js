@@ -1,6 +1,4 @@
-/* ================================
-   AUTH STORAGE (LOCALSTORAGE ONLY)
-   ================================ */
+/* ===== AUTH STORAGE ===== */
 
 function setUser(username) {
   localStorage.setItem("user", username);
@@ -14,116 +12,73 @@ function clearUser() {
   localStorage.removeItem("user");
 }
 
-/* ================================
-   PAGE LOAD HANDLING
-   ================================ */
+/* ===== PAGE LOAD ===== */
 
 document.addEventListener("DOMContentLoaded", () => {
+  const user = getUser();
   const path = window.location.pathname;
-  const username = getUser();
 
-  // If logged in and on login page → go home
-  if (username && (path.endsWith("/") || path.endsWith("index.html"))) {
-    window.location.replace("/home.html");
-    return;
-  }
-
-  // If not logged in and on home → go login
-  if (!username && path.endsWith("home.html")) {
+  if (!user && path.includes("home")) {
     window.location.replace("/index.html");
     return;
   }
 
-  // If on home and logged in → update header greeting
-  if (username && document.getElementById("header-greeting")) {
-    document.getElementById("header-greeting").textContent =
-      `Welcome To Child Apks, ${username}`;
+  if (user && path.includes("index")) {
+    window.location.replace("/home.html");
+    return;
+  }
+
+  const greeting = document.getElementById("header-greeting");
+  if (user && greeting) {
+    greeting.textContent = `Welcome To Child Apks, ${user}`;
   }
 });
 
-/* ================================
-   TAB SWITCHING (LOGIN / REGISTER)
-   ================================ */
+/* ===== AUTH TABS ===== */
 
-function showAuthTab(tabId) {
-  document.querySelectorAll(".auth-tab").forEach(tab => {
-    tab.classList.add("hidden");
-  });
-
-  document.getElementById(tabId).classList.remove("hidden");
+function showAuthTab(id) {
+  document.querySelectorAll(".auth-tab").forEach(t => t.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
 }
 
-/* ================================
-   TAB SWITCHING (HOME PAGE)
-   ================================ */
+/* ===== HOME TABS ===== */
 
-function showTab(tabId) {
-  document.querySelectorAll(".tab-content").forEach(tab => {
-    tab.classList.add("hidden");
-  });
-
-  document.getElementById(tabId).classList.remove("hidden");
+function showTab(id) {
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
 }
 
-/* ================================
-   LOGIN
-   ================================ */
+/* ===== LOGIN ===== */
 
 async function login() {
-  const username = document.getElementById("login-username").value.trim();
-  const password = document.getElementById("login-password").value;
+  const u = document.getElementById("login-username").value;
+  const p = document.getElementById("login-password").value;
 
-  if (!username || !password) {
-    alert("Please fill in all fields");
-    return;
-  }
+  if (!u || !p) return alert("Missing fields");
 
-  const res = await fetch("/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  });
-
-  if (!res.ok) {
-    alert(await res.text());
-    return;
-  }
-
-  setUser(username);
+  setUser(u);
   window.location.replace("/home.html");
 }
 
-/* ================================
-   REGISTER
-   ================================ */
+/* ===== REGISTER ===== */
 
 async function register() {
-  const username = document.getElementById("register-username").value.trim();
-  const password = document.getElementById("register-password").value;
+  const u = document.getElementById("register-username").value;
+  const p = document.getElementById("register-password").value;
 
-  if (!username || !password) {
-    alert("Please fill in all fields");
-    return;
-  }
+  if (!u || !p) return alert("Missing fields");
 
-  const res = await fetch("/api/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  });
-
-  if (!res.ok) {
-    alert(await res.text());
-    return;
-  }
-
-  setUser(username);
+  setUser(u);
   window.location.replace("/home.html");
 }
 
-/* ================================
-   LOGOUT
-   ================================ */
+/* ===== PAIR GAME ===== */
+
+function pairGame() {
+  alert("Pair Game clicked — logic comes next");
+}
+
+/* ===== LOGOUT ===== */
 
 function logout() {
   clearUser();
