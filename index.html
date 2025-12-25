@@ -7,27 +7,27 @@
 <script src="script.js" defer></script>
 </head>
 <body>
-<div class="auth-container">
-  <img src="images/childapkslogo.gif" class="logo" alt="Child Apks Logo">
+  <div class="auth-container">
+    <img src="images/childapkslogo.gif" class="logo" alt="Child Apks Logo">
 
-  <div class="tab">
-    <button id="login-tab">Login</button>
-    <button id="register-tab">Register</button>
+    <div class="tab">
+      <button id="login-tab">Login</button>
+      <button id="register-tab">Register</button>
+    </div>
+
+    <div id="login-form" class="form">
+      <input id="login-username" placeholder="Username">
+      <input id="login-password" type="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div id="register-form" class="form hidden">
+      <input id="register-username" placeholder="Username">
+      <input id="register-password" type="password" placeholder="Password">
+      <button onclick="register()">Register</button>
+    </div>
+
+    <pre id="output"></pre>
   </div>
-
-  <div id="login-form" class="form">
-    <input id="login-username" placeholder="Username">
-    <input id="login-password" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-  </div>
-
-  <div id="register-form" class="form hidden">
-    <input id="register-username" placeholder="Username">
-    <input id="register-password" type="password" placeholder="Password">
-    <button onclick="register()">Register</button>
-  </div>
-
-  <pre id="output"></pre>
-</div>
 </body>
 </html>
