@@ -1,0 +1,41 @@
+body {
+  background: #0b0b0b;
+  color: #ff2a2a;
+  font-family: monospace;
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.box {
+  background: #111;
+  padding: 25px;
+  border: 1px solid #ff2a2a;
+  width: 260px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  background: black;
+  color: red;
+  border: 1px solid red;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: red;
+  color: black;
+  border: none;
+  cursor: pointer;
+}
+
+.logo {
+  width: 120px;
+  margin-bottom: 10px;
+}
