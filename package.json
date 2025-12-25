@@ -1,0 +1,9 @@
+{
+  "name": "vercel-auth-site",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "@vercel/postgres": "^0.8.0"
+  }
+}
