@@ -1,4 +1,4 @@
-/* ==================
+/* ==========================
    TAB SWITCH WITH FADE-IN
 ========================== */
 function showTab(id) {
@@ -17,18 +17,6 @@ function showTab(id) {
 }
 
 /* ==========================
-   LOGIN PAGE TAB SWITCH
-========================== */
-document.getElementById('login-tab')?.addEventListener('click', () => {
-  document.getElementById('login-form').classList.remove('hidden');
-  document.getElementById('register-form').classList.add('hidden');
-});
-document.getElementById('register-tab')?.addEventListener('click', () => {
-  document.getElementById('login-form').classList.add('hidden');
-  document.getElementById('register-form').classList.remove('hidden');
-});
-
-/* ==========================
    COOKIE HELPERS
 ========================== */
 function setCookie(name, value, days) {
@@ -43,7 +31,7 @@ function eraseCookie(name) {
 }
 
 /* ==========================
-   UPDATE GREETING FUNCTION
+   UPDATE HEADER GREETING
 ========================== */
 function updateGreeting() {
   const username = getCookie('user');
@@ -54,76 +42,55 @@ function updateGreeting() {
 }
 
 /* ==========================
-   ON PAGE LOAD
+   ON HOME PAGE LOAD
 ========================== */
 window.addEventListener('DOMContentLoaded', () => {
-  const username = getCookie('user');
-
-  // redirect logged-in users from login page
-  if (username && window.location.pathname.includes('index.html')) {
-    window.location.href = '/home.html';
+  // Update greeting if on home page
+  if (window.location.pathname.includes('home.html')) {
+    updateGreeting();
   }
-
-  // update greeting if on home page
-  updateGreeting();
 });
 
 /* ==========================
-   REGISTER FUNCTION
+   LOGIN / REGISTER FUNCTIONS
 ========================== */
 async function register() {
-  const username = document.getElementById('register-username').value.trim();
-  const password = document.getElementById('register-password').value;
-
+  const username = document.getElementById('register-username')?.value.trim();
+  const password = document.getElementById('register-password')?.value;
   if (!username || !password) return alert("Enter a valid username and password");
 
-  try {
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({username, password})
-    });
-
+  const res = await fetch('/api/register', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({username, password})
+  });
+  if (res.ok) {
+    setCookie('user', username, 7);
+    window.location.href = '/home.html';
+  } else {
     const text = await res.text();
     document.getElementById('output').textContent = text;
-
-    if (res.ok) {
-      setCookie('user', username, 7);
-      window.location.href = '/home.html';
-    }
-  } catch (err) {
-    console.error(err);
-    document.getElementById('output').textContent = "Server error";
   }
 }
 
-/* ==========================
-   LOGIN FUNCTION
-========================== */
 async function login() {
-  const username = document.getElementById('login-username').value.trim();
-  const password = document.getElementById('login-password').value;
-
+  const username = document.getElementById('login-username')?.value.trim();
+  const password = document.getElementById('login-password')?.value;
   if (!username || !password) return alert("Enter a valid username and password");
 
-  try {
-    const res = await fetch('/api/login', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({username, password})
-    });
+  const res = await fetch('/api/login', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({username, password})
+  });
 
-    const data = await res.json().catch(() => ({error:true}));
-
-    if (res.ok) {
-      setCookie('user', data.username, 7);
-      window.location.href = '/home.html';
-    } else {
-      document.getElementById('output').textContent = data.error || "Login failed";
-    }
-  } catch(err) {
-    console.error(err);
-    document.getElementById('output').textContent = "Server error";
+  if (res.ok) {
+    const data = await res.json();
+    setCookie('user', data.username, 7);
+    window.location.href = '/home.html';
+  } else {
+    const data = await res.json().catch(() => ({error:"Login failed"}));
+    document.getElementById('output').textContent = data.error;
   }
 }
 
@@ -131,9 +98,7 @@ async function login() {
    LOGOUT FUNCTION
 ========================== */
 async function logout() {
-  try {
-    await fetch('/api/logout');
-  } catch(err) { console.error(err); }
+  try { await fetch('/api/logout'); } catch(e) {}
   eraseCookie('user');
   window.location.href = '/index.html';
 }
@@ -143,26 +108,20 @@ async function logout() {
 ========================== */
 async function updateUsername() {
   const oldUsername = getCookie('user');
-  const newUsername = document.getElementById('new-username').value.trim();
-
+  const newUsername = document.getElementById('new-username')?.value.trim();
   if (!newUsername) return alert("Enter a valid username");
 
-  try {
-    const res = await fetch('/api/update-username', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({oldUsername, newUsername})
-    });
+  const res = await fetch('/api/update-username', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({oldUsername, newUsername})
+  });
 
-    if (res.ok) {
-      setCookie('user', newUsername, 7);
-      updateGreeting();
-      alert('Username updated!');
-    } else {
-      alert(await res.text());
-    }
-  } catch(err) {
-    console.error(err);
-    alert("Server error");
+  if (res.ok) {
+    setCookie('user', newUsername, 7);
+    updateGreeting(); // Update header text immediately
+    alert('Username updated!');
+  } else {
+    alert(await res.text());
   }
 }
