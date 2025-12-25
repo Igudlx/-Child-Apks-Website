@@ -1,6 +1,6 @@
 // -------------------------
 // HOME / SETTINGS TAB LOGIC
-// -------------------------
+// ----------------asdasds---------
 function showTab(id) {
   document.querySelectorAll(".tab-content").forEach(el => {
     el.classList.add("hidden");
