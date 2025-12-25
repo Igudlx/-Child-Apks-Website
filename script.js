@@ -1,192 +1,180 @@
-/* ===============================
-   PAGE LOAD / ROUTING
-   =============================== */
+// =========================
+// Full script.js for Child Apks
+// =========================
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const path = window.location.pathname;
+const apiBase = "/api"; // Vercel API base
+let currentUser = null;
 
-  // If home page, check auth
-  if (path.includes("home.html")) {
-    const res = await fetch("/api/check-auth", {
-      method: "GET",
-      credentials: "include"
-    });
+// -------------------------
+// LOGIN / REGISTER
+// -------------------------
+async function loginUser() {
+    const username = document.getElementById("login-username").value;
+    const password = document.getElementById("login-password").value;
 
-    const data = await res.json();
-    if (!data.username) {
-      window.location.replace("/index.html");
-      return;
+    try {
+        const res = await fetch(`${apiBase}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+            credentials: "include"
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || "Login failed");
+        currentUser = username;
+        showHome();
+        loadPairedGames();
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
     }
-
-    // Update header greeting
-    const header = document.getElementById("header-greeting");
-    if (header) header.textContent = `Welcome To Child Apks, ${data.username}`;
-
-    // Load paired games
-    loadPairedGames();
-  }
-});
-
-/* ===============================
-   AUTH TABS (LOGIN / REGISTER)
-   =============================== */
-
-function showAuthTab(id) {
-  document.querySelectorAll(".auth-tab").forEach(tab => tab.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
 }
 
-/* ===============================
-   HOME PAGE TAB SWITCH
-   =============================== */
+async function registerUser() {
+    const username = document.getElementById("register-username").value;
+    const password = document.getElementById("register-password").value;
 
+    try {
+        const res = await fetch(`${apiBase}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+            credentials: "include"
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || "Registration failed");
+        currentUser = username;
+        showHome();
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
+    }
+}
+
+// Toggle between login/register forms
+function showLoginForm() {
+    document.getElementById("login-form").classList.remove("hidden");
+    document.getElementById("register-form").classList.add("hidden");
+}
+
+function showRegisterForm() {
+    document.getElementById("register-form").classList.remove("hidden");
+    document.getElementById("login-form").classList.add("hidden");
+}
+
+// -------------------------
+// HOME / SETTINGS TAB
+// -------------------------
 function showTab(id) {
-  document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
-
-/* ===============================
-   LOGIN
-   =============================== */
-
-async function login() {
-  const username = document.getElementById("login-username").value.trim();
-  const password = document.getElementById("login-password").value;
-
-  if (!username || !password) return alert("Fill in all fields");
-
-  try {
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-      credentials: "include"
+    document.querySelectorAll(".tab-content").forEach(el => {
+        el.classList.add("hidden");
+        el.style.opacity = 0;
     });
-
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || "Login failed");
-      return;
-    }
-
-    // Redirect to home after login
-    window.location.replace("/home.html");
-  } catch (e) {
-    console.error(e);
-    alert("Server error");
-  }
+    const tab = document.getElementById(id);
+    tab.classList.remove("hidden");
+    let opacity = 0;
+    const fade = setInterval(() => {
+        opacity += 0.05;
+        tab.style.opacity = opacity;
+        if (opacity >= 1) clearInterval(fade);
+    }, 15);
 }
 
-/* ===============================
-   REGISTER
-   =============================== */
-
-async function register() {
-  const username = document.getElementById("register-username").value.trim();
-  const password = document.getElementById("register-password").value;
-
-  if (!username || !password) return alert("Fill in all fields");
-
-  try {
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-      credentials: "include"
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || "Register failed");
-      return;
-    }
-
-    // Redirect to home after register
-    window.location.replace("/home.html");
-  } catch (e) {
-    console.error(e);
-    alert("Server error");
-  }
+// Show home page after login
+function showHome() {
+    showTab("home-tab");
+    document.getElementById("welcome-header").textContent = `Welcome To Child Apks, ${currentUser}`;
 }
 
-/* ===============================
-   LOGOUT
-   =============================== */
+// Show settings page
+function showSettings() {
+    showTab("settings-tab");
+}
 
+// Logout
 async function logout() {
-  try {
-    await fetch("/api/logout", {
-      method: "POST",
-      credentials: "include"
+    await fetch(`${apiBase}/logout`, {
+        method: "POST",
+        credentials: "include"
     });
-  } catch (e) { console.error(e); }
-
-  window.location.replace("/index.html");
+    currentUser = null;
+    window.location.href = "index.html";
 }
 
-/* ===============================
-   PAIR GAME
-   =============================== */
+// -------------------------
+// PAIRED GAMES
+// -------------------------
+async function requestPairing() {
+    const gameName = prompt("Enter your game's name:");
+    if (!gameName) return;
 
-async function pairGame() {
-  const code = prompt("Enter pairing code from the game:");
-  if (!code) return;
+    try {
+        const res = await fetch(`${apiBase}/request-pairing`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ game_name: gameName })
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || "Failed to request pairing");
 
-  try {
-    const res = await fetch("/api/pair-game", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
-      credentials: "include"
-    });
-
-    const data = await res.json();
-    if (!res.ok) return alert(data.error || "Pairing failed");
-
-    // Refresh paired games list
-    loadPairedGames();
-    alert("Game paired successfully!");
-  } catch (e) {
-    console.error(e);
-    alert("Server error");
-  }
+        alert("Send this pairing code to your Unity game: " + data.code);
+        loadPairedGames(); // refresh list
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
+    }
 }
-
-/* ===============================
-   LOAD PAIRED GAMES
-   =============================== */
 
 async function loadPairedGames() {
-  const container = document.getElementById("paired-games");
-  if (!container) return;
+    const container = document.getElementById("paired-games");
+    if (!container) return;
 
-  try {
-    const res = await fetch("/api/get-user-games", {
-      method: "GET",
-      credentials: "include"
-    });
+    try {
+        const res = await fetch(`${apiBase}/get-user-games`, {
+            method: "GET",
+            credentials: "include"
+        });
 
-    if (!res.ok) {
-      container.innerHTML = "<p>Failed to load games</p>";
-      return;
+        const data = await res.json();
+        container.innerHTML = "";
+
+        if (!data.length) {
+            container.innerHTML = "<p>No paired games yet.</p>";
+            return;
+        }
+
+        data.forEach(game => {
+            const div = document.createElement("div");
+            div.className = "game-card";
+            div.textContent = `${game.game_name} — Paired`;
+            container.appendChild(div);
+        });
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p>Failed to load games</p>";
     }
-
-    const games = await res.json();
-    container.innerHTML = "";
-
-    if (!games.length) {
-      container.innerHTML = "<p>No paired games yet.</p>";
-      return;
-    }
-
-    games.forEach(game => {
-      const div = document.createElement("div");
-      div.className = "game-card";
-      div.textContent = `${game.game_name} — Paired`;
-      container.appendChild(div);
-    });
-  } catch (e) {
-    console.error(e);
-    container.innerHTML = "<p>Failed to load games</p>";
-  }
 }
+
+// -------------------------
+// CHECK LOGIN ON PAGE LOAD
+// -------------------------
+async function checkAuth() {
+    try {
+        const res = await fetch(`${apiBase}/check-auth`, {
+            method: "GET",
+            credentials: "include"
+        });
+        const data = await res.json();
+        if (res.ok && data.username) {
+            currentUser = data.username;
+            showHome();
+            loadPairedGames();
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// Run checkAuth when the page loads
+window.addEventListener("load", checkAuth);
