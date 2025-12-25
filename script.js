@@ -1,4 +1,4 @@
-/* =========================
+/* ==========================
    TAB SWITCH WITH FADE-IN
 ========================== */
 function showTab(id) {
@@ -43,19 +43,30 @@ function eraseCookie(name) {
 }
 
 /* ==========================
-   CHECK IF USER ALREADY LOGGED IN
+   UPDATE GREETING FUNCTION
 ========================== */
-window.onload = () => {
+function updateGreeting() {
   const username = getCookie('user');
+  const greetingEl = document.getElementById('greeting');
+  if (username && greetingEl) {
+    greetingEl.textContent = `Welcome To Child Apks, ${username}`;
+  }
+}
+
+/* ==========================
+   ON PAGE LOAD
+========================== */
+window.addEventListener('DOMContentLoaded', () => {
+  const username = getCookie('user');
+
+  // redirect logged-in users from login page
   if (username && window.location.pathname.includes('index.html')) {
     window.location.href = '/home.html';
   }
 
-  // Set greeting if on home page
-  if (username && document.getElementById('greeting')) {
-    document.getElementById('greeting').textContent = `Welcome To Child Apks, ${username}`;
-  }
-};
+  // update greeting if on home page
+  updateGreeting();
+});
 
 /* ==========================
    REGISTER FUNCTION
@@ -145,7 +156,7 @@ async function updateUsername() {
 
     if (res.ok) {
       setCookie('user', newUsername, 7);
-      document.getElementById('greeting').textContent = `Welcome To Child Apks, ${newUsername}`;
+      updateGreeting();
       alert('Username updated!');
     } else {
       alert(await res.text());
