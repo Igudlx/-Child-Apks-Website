@@ -7,6 +7,12 @@
 <script src="script.js" defer></script>
 </head>
 <body>
+
+  <!-- LOGO CENTER TOP -->
+  <div class="home-logo">
+    <img src="images/childapkslogo.gif" alt="Child Apks Logo">
+  </div>
+
   <!-- NAV -->
   <nav>
     <span id="greeting">Hello. Welcome To Child Apks</span>
@@ -16,17 +22,19 @@
     </div>
   </nav>
 
-  <!-- MAIN CONTENT -->
+  <!-- HOME TAB CONTENT -->
   <div id="home" class="tab-content">
     <h2>Home</h2>
     <p>Welcome to Child Apks!</p>
   </div>
 
+  <!-- SETTINGS TAB CONTENT -->
   <div id="settings" class="tab-content hidden">
     <h2>Settings</h2>
     <input id="new-username" placeholder="New Username">
     <button onclick="updateUsername()">Change Username</button>
     <button onclick="logout()">Logout</button>
   </div>
+
 </body>
 </html>
