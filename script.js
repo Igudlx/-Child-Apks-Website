@@ -1,307 +1,131 @@
-/* ==========================
-   GLOBAL ERROR GUARD
-========================== */
-window.onerror = function (msg, url, line) {
-  console.error("JS ERROR:", msg, "Line:", line);
-  return false;
-};
+/* ================================
+   AUTH STORAGE (LOCALSTORAGE ONLY)
+   ================================ */
 
-/* ==========================
-   DOM READY
-========================== */
-window.addEventListener("DOMContentLoaded", () => {
-  setupAuthTabs();
-  setupAuthForms();
-
-  // ONLY enforce login on home page
-  if (document.getElementById("greeting")) {
-    enforceHomeAuth();
-    loadGamesSafe();
-  }
-});
-
-/* ==========================
-   LOGIN / REGISTER TABS
-========================== */
-function setupAuthTabs() {
-  const loginTab = document.getElementById("login-tab");
-  const registerTab = document.getElementById("register-tab");
-  const loginForm = document.getElementById("login-form");
-  const registerForm = document.getElementById("register-form");
-
-  if (!loginTab || !registerTab || !loginForm || !registerForm) return;
-
-  loginTab.onclick = () => {
-    loginForm.classList.remove("hidden");
-    registerForm.classList.add("hidden");
-  };
-
-  registerTab.onclick = () => {
-    registerForm.classList.remove("hidden");
-    loginForm.classList.add("hidden");
-  };
+function setUser(username) {
+  localStorage.setItem("user", username);
 }
 
-/* ==========================
-   PREVENT FORM RELOAD
-========================== */
-function setupAuthForms() {
-  const loginForm = document.getElementById("login-form");
-  const registerForm = document.getElementById("register-form");
-
-  if (loginForm) {
-    loginForm.addEventListener("submit", e => {
-      e.preventDefault();
-      login();
-    });
-  }
-
-  if (registerForm) {
-    registerForm.addEventListener("submit", e => {
-      e.preventDefault();
-      register();
-    });
-  }
+function getUser() {
+  return localStorage.getItem("user");
 }
 
-/* ==========================
-   COOKIE HELPERS
-========================== */
-function getCookie(name) {
-  const v = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
-  return v ? v[2] : null;
+function clearUser() {
+  localStorage.removeItem("user");
 }
 
-function setCookie(name, value, days) {
-  document.cookie = `${name}=${value}; path=/; max-age=${days * 86400}`;
-}
+/* ================================
+   PAGE LOAD HANDLING
+   ================================ */
 
-function eraseCookie(name) {
-  document.cookie = `${name}=; Max-Age=0; path=/`;
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const path = window.location.pathname;
+  const username = getUser();
 
-/* ==========================
-   LOGIN
-========================== */
-async function login() {
-  const username = document.getElementById("login-username")?.value.trim();
-  const password = document.getElementById("login-password")?.value;
-
-  if (!username || !password) {
-    alert("Enter username and password");
+  // If logged in and on login page → go home
+  if (username && (path.endsWith("/") || path.endsWith("index.html"))) {
+    window.location.replace("/home.html");
     return;
   }
 
-  try {
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.error || "Login failed");
-      return;
-    }
-
-    setCookie("user", data.username, 7);
-
-    // HARD redirect after cookie is set
-    window.location.replace("/home.html");
-  } catch (e) {
-    console.error(e);
-    alert("Server error");
-  }
-}
-
-/* ==========================
-   REGISTER
-========================== */
-async function register() {
-  const username = document.getElementById("register-username")?.value.trim();
-  const password = document.getElementById("register-password")?.value;
-
-  if (!username || !password) {
-    alert("Enter username and password");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-
-    if (!res.ok) {
-      alert(await res.text());
-      return;
-    }
-
-    setCookie("user", username, 7);
-    window.location.replace("/home.html");
-  } catch (e) {
-    console.error(e);
-    alert("Server error");
-  }
-}
-
-/* ==========================
-   HOME AUTH + GREETING
-========================== */
-function enforceHomeAuth() {
-  const username = getCookie("user");
-
-  if (!username) {
+  // If not logged in and on home → go login
+  if (!username && path.endsWith("home.html")) {
     window.location.replace("/index.html");
     return;
   }
 
-  const greeting = document.getElementById("greeting");
-  if (greeting) {
-    greeting.textContent = `Welcome To Child Apks, ${username}`;
+  // If on home and logged in → update header greeting
+  if (username && document.getElementById("header-greeting")) {
+    document.getElementById("header-greeting").textContent =
+      `Welcome To Child Apks, ${username}`;
   }
-}
+});
 
-/* ==========================
-   TAB SWITCH (HOME)
-========================== */
-function showTab(id) {
-  document.querySelectorAll(".tab-content").forEach(el => {
-    el.classList.add("hidden");
-    el.style.opacity = 0;
+/* ================================
+   TAB SWITCHING (LOGIN / REGISTER)
+   ================================ */
+
+function showAuthTab(tabId) {
+  document.querySelectorAll(".auth-tab").forEach(tab => {
+    tab.classList.add("hidden");
   });
 
-  const tab = document.getElementById(id);
-  if (!tab) return;
-
-  tab.classList.remove("hidden");
-
-  let o = 0;
-  const fade = setInterval(() => {
-    o += 0.05;
-    tab.style.opacity = o;
-    if (o >= 1) clearInterval(fade);
-  }, 15);
+  document.getElementById(tabId).classList.remove("hidden");
 }
 
-/* ==========================
-   PAIR MODAL
-========================== */
-function openPairModal() {
-  document.getElementById("pairModal")?.classList.remove("hidden");
+/* ================================
+   TAB SWITCHING (HOME PAGE)
+   ================================ */
+
+function showTab(tabId) {
+  document.querySelectorAll(".tab-content").forEach(tab => {
+    tab.classList.add("hidden");
+  });
+
+  document.getElementById(tabId).classList.remove("hidden");
 }
 
-function closePairModal() {
-  document.getElementById("pairModal")?.classList.add("hidden");
-}
+/* ================================
+   LOGIN
+   ================================ */
 
-/* ==========================
-   PAIR GAME
-========================== */
-async function pairGame() {
-  const code = document.getElementById("pairCodeInput")?.value.trim();
-  const username = getCookie("user");
+async function login() {
+  const username = document.getElementById("login-username").value.trim();
+  const password = document.getElementById("login-password").value;
 
-  if (!code) return alert("Enter a code");
-
-  try {
-    const res = await fetch("/api/pair-game", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, code })
-    });
-
-    if (!res.ok) {
-      alert(await res.text());
-      return;
-    }
-
-    closePairModal();
-    loadGamesSafe();
-    alert("Game paired!");
-  } catch (e) {
-    console.error(e);
-    alert("Server error");
+  if (!username || !password) {
+    alert("Please fill in all fields");
+    return;
   }
-}
 
-/* ==========================
-   LOAD GAMES (SAFE)
-========================== */
-async function loadGamesSafe() {
-  const container = document.getElementById("games");
-  if (!container) return;
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
 
-  const username = getCookie("user");
-  if (!username) return;
-
-  try {
-    const res = await fetch(`/api/get-user-games?username=${username}`);
-    if (!res.ok) {
-      container.innerHTML = "<p>Error loading games</p>";
-      return;
-    }
-
-    const games = await res.json();
-    container.innerHTML = "";
-
-    if (!games.length) {
-      container.innerHTML = "<p>No games paired yet.</p>";
-      return;
-    }
-
-    games.forEach(g => {
-      const div = document.createElement("div");
-      div.className = "game-card";
-      div.textContent = g.game_name;
-      container.appendChild(div);
-    });
-  } catch (e) {
-    console.error(e);
-    container.innerHTML = "<p>Failed to load games</p>";
+  if (!res.ok) {
+    alert(await res.text());
+    return;
   }
+
+  setUser(username);
+  window.location.replace("/home.html");
 }
 
-/* ==========================
-   UPDATE USERNAME
-========================== */
-async function updateUsername() {
-  const input = document.getElementById("new-username");
-  if (!input) return;
+/* ================================
+   REGISTER
+   ================================ */
 
-  const newUsername = input.value.trim();
-  const oldUsername = getCookie("user");
+async function register() {
+  const username = document.getElementById("register-username").value.trim();
+  const password = document.getElementById("register-password").value;
 
-  if (!newUsername) return alert("Enter a username");
-
-  try {
-    const res = await fetch("/api/update-username", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ oldUsername, newUsername })
-    });
-
-    if (!res.ok) {
-      alert(await res.text());
-      return;
-    }
-
-    setCookie("user", newUsername, 7);
-    enforceHomeAuth();
-    alert("Username updated!");
-  } catch (e) {
-    console.error(e);
-    alert("Server error");
+  if (!username || !password) {
+    alert("Please fill in all fields");
+    return;
   }
+
+  const res = await fetch("/api/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  if (!res.ok) {
+    alert(await res.text());
+    return;
+  }
+
+  setUser(username);
+  window.location.replace("/home.html");
 }
 
-/* ==========================
+/* ================================
    LOGOUT
-========================== */
+   ================================ */
+
 function logout() {
-  eraseCookie("user");
+  clearUser();
   window.location.replace("/index.html");
 }
