@@ -1,4 +1,4 @@
-/* ==========================
+/* =======================
    WAIT FOR DOM TO LOAD
 ========================== */
 window.addEventListener('DOMContentLoaded', () => {
