@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { sql } from "@vercel/postgres";asasd
+import { sql } from "@vercel/postgres";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -36,4 +36,5 @@ export default async function handler(req, res) {
     return res.status(500).send("Server error");
   }
 }
+
 
