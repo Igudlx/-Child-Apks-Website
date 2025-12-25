@@ -1,22 +1,63 @@
 * {
   box-sizing: border-box;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, #0a0a0a, #111);
-  color: white;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b0b0f, #141420);
+  color: #ffffff;
 }
+
+/* ---------- UTIL ---------- */
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
-/* ---------- AUTH PAGE ---------- */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 15px;
+  background: #1f1f2e;
+  color: white;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+button:hover {
+  background: #2b2b3d;
+  transform: translateY(-1px);
+}
+
+button.primary {
+  background: #ff2e2e;
+}
+
+button.primary:hover {
+  background: #ff4545;
+}
+
+button.danger {
+  background: #b00020;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  background: #1c1c28;
+  color: white;
+  font-size: 14px;
+}
+
+/* ---------- LOGIN / REGISTER ---------- */
 
 .auth-container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,29 +69,36 @@ body {
   margin-bottom: 20px;
 }
 
-.auth-switch button {
-  margin: 5px;
+.auth-switch {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .auth-tab {
+  width: 260px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 260px;
+  gap: 12px;
 }
 
-/* ---------- HOME ---------- */
+/* ---------- HOME / SETTINGS ---------- */
 
-.top-bar {
+header {
+  background: #11111a;
   display: flex;
   align-items: center;
-  padding: 15px;
-  background: #111;
   gap: 15px;
+  padding: 14px 20px;
 }
 
 .header-logo {
-  width: 50px;
+  width: 46px;
+}
+
+header h1 {
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .nav-buttons {
@@ -63,35 +111,34 @@ main {
   padding: 30px;
 }
 
-button {
-  padding: 10px 16px;
-  background: #1f1f1f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.tab-content {
+  animation: fadeIn 0.2s ease;
 }
 
-button:hover {
-  background: #333;
+#paired-games {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-button.primary {
-  background: #ff2d2d;
+.game-card {
+  padding: 14px;
+  background: #1c1c28;
+  border-radius: 8px;
 }
 
-button.primary:hover {
-  background: #ff4444;
-}
+/* ---------- ANIM ---------- */
 
-button.danger {
-  background: #b00020;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ---------- MOBILE ---------- */
 
 @media (max-width: 600px) {
-  .top-bar {
+  header {
     flex-direction: column;
     align-items: flex-start;
   }
