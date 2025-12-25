@@ -120,3 +120,153 @@ button.submit-btn:hover {
         margin-top: 10px;
     }
 }
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b0b0f, #141420);
+  color: #ffffff;
+}
+
+/* ---------- UTIL ---------- */
+
+.hidden {
+  display: none !important;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 15px;
+  background: #1f1f2e;
+  color: white;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+button:hover {
+  background: #2b2b3d;
+  transform: translateY(-1px);
+}
+
+button.primary {
+  background: #ff2e2e;
+}
+
+button.primary:hover {
+  background: #ff4545;
+}
+
+button.danger {
+  background: #b00020;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  background: #1c1c28;
+  color: white;
+  font-size: 14px;
+}
+
+/* ---------- LOGIN / REGISTER ---------- */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 140px;
+  margin-bottom: 20px;
+}
+
+.auth-switch {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.auth-tab {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- HOME / SETTINGS ---------- */
+
+header {
+  background: #11111a;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 20px;
+}
+
+.header-logo {
+  width: 46px;
+}
+
+header h1 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.nav-buttons {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+main {
+  padding: 30px;
+}
+
+.tab-content {
+  animation: fadeIn 0.2s ease;
+}
+
+#paired-games {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-card {
+  padding: 14px;
+  background: #1c1c28;
+  border-radius: 8px;
+}
+
+/* ---------- ANIM ---------- */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-buttons {
+    margin-left: 0;
+  }
+}
