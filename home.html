@@ -2,68 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Child Apks</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>Child Apks — Home</title>
   <link rel="stylesheet" href="style.css" />
-  <script defer src="script.js"></script>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <img src="images/logo.png" class="logo" alt="Child Apks Logo" />
-      <h1 id="greeting">Welcome To Child Apks</h1>
-    </div>
+<header class="top-bar">
+  <img src="images/logo.png" class="header-logo" />
+  <h1 id="header-greeting">Welcome To Child Apks</h1>
 
-    <div class="header-right">
-      <button onclick="showTab('home-tab')">Home</button>
-      <button onclick="showTab('settings-tab')">Settings</button>
-    </div>
-  </header>
-
-  <!-- MAIN CONTENT -->
-  <main class="main">
-
-    <!-- HOME TAB -->
-    <section id="home-tab" class="tab-content">
-      <div class="home-actions">
-        <button class="primary" onclick="openPairModal()">Pair Game</button>
-      </div>
-
-      <h2 class="section-title">Your Paired Games</h2>
-
-      <div id="games" class="games-list">
-        <!-- Games injected here -->
-      </div>
-    </section>
-
-    <!-- SETTINGS TAB -->
-    <section id="settings-tab" class="tab-content hidden">
-      <h2 class="section-title">Settings</h2>
-
-      <div class="settings-box">
-        <input id="new-username" placeholder="New Username" />
-        <button onclick="updateUsername()">Change Username</button>
-      </div>
-
-      <button class="danger" onclick="logout()">Log Out</button>
-    </section>
-
-  </main>
-
-  <!-- PAIR MODAL -->
-  <div id="pairModal" class="modal hidden">
-    <div class="modal-box">
-      <h2>Pair Game</h2>
-      <input id="pairCodeInput" placeholder="Enter Pair Code" />
-      <div class="modal-actions">
-        <button class="primary" onclick="pairGame()">Pair</button>
-        <button onclick="closePairModal()">Cancel</button>
-      </div>
-    </div>
+  <div class="nav-buttons">
+    <button onclick="showTab('home-tab')">Home</button>
+    <button onclick="showTab('settings-tab')">Settings</button>
   </div>
+</header>
 
+<main>
+  <section id="home-tab" class="tab-content">
+    <button class="primary" onclick="pairGame()">Pair Game</button>
+
+    <div id="paired-games"></div>
+  </section>
+
+  <section id="settings-tab" class="tab-content hidden">
+    <button class="danger" onclick="logout()">Logout</button>
+  </section>
+</main>
+
+<script src="script.js"></script>
 </body>
 </html>
