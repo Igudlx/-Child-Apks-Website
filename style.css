@@ -1,149 +1,122 @@
-* {
-  box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
+/* =========================
+   Child Apks — style.css
+   ========================= */
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0b0b0f, #141420);
-  color: #ffffff;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #0a0a0a;
+    color: #fff;
 }
-
-/* ---------- UTIL ---------- */
-
-.hidden {
-  display: none !important;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 18px;
-  font-size: 15px;
-  background: #1f1f2e;
-  color: white;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-button:hover {
-  background: #2b2b3d;
-  transform: translateY(-1px);
-}
-
-button.primary {
-  background: #ff2e2e;
-}
-
-button.primary:hover {
-  background: #ff4545;
-}
-
-button.danger {
-  background: #b00020;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 6px;
-  border: none;
-  background: #1c1c28;
-  color: white;
-  font-size: 14px;
-}
-
-/* ---------- LOGIN / REGISTER ---------- */
-
-.auth-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo {
-  width: 140px;
-  margin-bottom: 20px;
-}
-
-.auth-switch {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.auth-tab {
-  width: 260px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* ---------- HOME / SETTINGS ---------- */
 
 header {
-  background: #11111a;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 14px 20px;
+    background-color: #1a1a1a;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #ff0000;
 }
 
-.header-logo {
-  width: 46px;
+header img {
+    height: 50px;
 }
 
 header h1 {
-  font-size: 18px;
-  font-weight: 600;
+    margin: 0;
+    font-size: 20px;
+    color: #ff0000;
 }
 
-.nav-buttons {
-  margin-left: auto;
-  display: flex;
-  gap: 10px;
+nav button {
+    margin-left: 10px;
+    padding: 8px 16px;
+    background-color: #ff0000;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
-main {
-  padding: 30px;
+nav button:hover {
+    background-color: #cc0000;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: #1a1a1a;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ff0000;
+    background-color: #0a0a0a;
+    color: #fff;
+}
+
+input:focus {
+    outline: none;
+    border-color: #ff5555;
+}
+
+button.submit-btn {
+    padding: 10px;
+    border: none;
+    background-color: #ff0000;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+button.submit-btn:hover {
+    background-color: #cc0000;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .tab-content {
-  animation: fadeIn 0.2s ease;
-}
-
-#paired-games {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    width: 100%;
+    max-width: 800px;
+    margin-top: 20px;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .game-card {
-  padding: 14px;
-  background: #1c1c28;
-  border-radius: 8px;
+    background-color: #1a1a1a;
+    border: 1px solid #ff0000;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
 }
 
-/* ---------- ANIM ---------- */
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* ---------- MOBILE ---------- */
-
-@media (max-width: 600px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .nav-buttons {
-    margin-left: 0;
-  }
+@media screen and (max-width: 600px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    nav {
+        margin-top: 10px;
+    }
 }
