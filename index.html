@@ -1,53 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Secure Account System</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Child Apks - Login</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
 </head>
 <body>
-
-<div class="box">
+<div class="auth-container">
   <img src="images/logo.png" class="logo">
-  <h2>Create Account</h2>
-  <input id="rEmail" placeholder="Email">
-  <input id="rPass" type="password" placeholder="Password">
-  <button onclick="register()">Register</button>
+  <div class="tab">
+    <button id="login-tab">Login</button>
+    <button id="register-tab">Register</button>
+  </div>
+
+  <div id="login-form" class="form">
+    <input id="login-username" placeholder="Username">
+    <input id="login-password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="register-form" class="form hidden">
+    <input id="register-username" placeholder="Username">
+    <input id="register-password" type="password" placeholder="Password">
+    <button onclick="register()">Register</button>
+  </div>
+
+  <pre id="output"></pre>
 </div>
-
-<div class="box">
-  <h2>Login</h2>
-  <input id="lEmail" placeholder="Email">
-  <input id="lPass" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-</div>
-
-<pre id="output"></pre>
-
-<script>
-async function register() {
-  const res = await fetch("/api/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: rEmail.value,
-      password: rPass.value
-    })
-  });
-  output.textContent = await res.text();
-}
-
-async function login() {
-  const res = await fetch("/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: lEmail.value,
-      password: lPass.value
-    })
-  });
-  output.textContent = await res.text();
-}
-</script>
-
 </body>
 </html>
