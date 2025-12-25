@@ -1,73 +1,3 @@
-// =========================
-// Child Apks — Full script.js
-// =========================
-
-const apiBase = "/api"; // Vercel API base
-let currentUser = null;
-
-// -------------------------
-// LOGIN / REGISTER
-// -------------------------
-
-// Login function
-async function loginUser() {
-  const username = document.getElementById("login-username").value;
-  const password = document.getElementById("login-password").value;
-
-  try {
-    const res = await fetch(`${apiBase}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-      credentials: "include"
-    });
-    const data = await res.json();
-    if (!res.ok) return alert(data.error || "Login failed");
-
-    currentUser = username;
-    showHome();
-    loadPairedGames();
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  }
-}
-
-// Register function
-async function registerUser() {
-  const username = document.getElementById("register-username").value;
-  const password = document.getElementById("register-password").value;
-
-  try {
-    const res = await fetch(`${apiBase}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-      credentials: "include"
-    });
-    const data = await res.json();
-    if (!res.ok) return alert(data.error || "Registration failed");
-
-    currentUser = username;
-    showHome();
-    loadPairedGames();
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  }
-}
-
-// Toggle login/register forms
-function showLoginForm() {
-  document.getElementById("login-form").classList.remove("hidden");
-  document.getElementById("register-form").classList.add("hidden");
-}
-
-function showRegisterForm() {
-  document.getElementById("register-form").classList.remove("hidden");
-  document.getElementById("login-form").classList.add("hidden");
-}
-
 // -------------------------
 // HOME / SETTINGS TAB LOGIC
 // -------------------------
@@ -97,15 +27,6 @@ function showSettings() {
   showTab("settings-tab");
 }
 
-async function logout() {
-  await fetch(`${apiBase}/logout`, {
-    method: "POST",
-    credentials: "include"
-  });
-  currentUser = null;
-  window.location.href = "index.html";
-}
-
 // -------------------------
 // PAIR GAME / PAIRED GAMES
 // -------------------------
@@ -114,7 +35,7 @@ async function requestPairing() {
   if (!gameName) return;
 
   try {
-    const res = await fetch(`${apiBase}/request-pairing`, {
+    const res = await fetch("/api/request-pairing", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -136,11 +57,10 @@ async function loadPairedGames() {
   if (!container) return;
 
   try {
-    const res = await fetch(`${apiBase}/get-user-games`, {
+    const res = await fetch("/api/get-user-games", {
       method: "GET",
       credentials: "include"
     });
-
     const data = await res.json();
     container.innerHTML = "";
 
@@ -166,7 +86,7 @@ async function loadPairedGames() {
 // -------------------------
 async function checkAuth() {
   try {
-    const res = await fetch(`${apiBase}/check-auth`, {
+    const res = await fetch("/api/check-auth", {
       method: "GET",
       credentials: "include"
     });
@@ -181,7 +101,4 @@ async function checkAuth() {
   }
 }
 
-// -------------------------
-// INITIALIZE
-// -------------------------
 window.addEventListener("load", checkAuth);
