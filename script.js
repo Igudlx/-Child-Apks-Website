@@ -12,7 +12,7 @@ function clearUser() {
   localStorage.removeItem("user");
 }
 
-/* ===== PAGE LOAD ===== */
+/* ===== PAGE LOAD ==== */
 
 document.addEventListener("DOMContentLoaded", () => {
   const user = getUser();
