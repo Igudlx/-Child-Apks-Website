@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
     if (!code) return res.status(400).json({ error: 'Missing code' });
 
-    // Replace this with your session check logic
+    // Replace this with your sessiocheck logic
     const username = req.cookies.user || null;
     if (!username) return res.status(401).json({ error: 'Not logged in' });
 
