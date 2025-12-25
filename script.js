@@ -1,5 +1,5 @@
 // =========================
-// Full script.js for Child Apks
+// script.js — Full Working
 // =========================
 
 const apiBase = "/api"; // Vercel API base
@@ -51,7 +51,7 @@ async function registerUser() {
     }
 }
 
-// Toggle between login/register forms
+// Toggle login/register forms
 function showLoginForm() {
     document.getElementById("login-form").classList.remove("hidden");
     document.getElementById("register-form").classList.add("hidden");
@@ -63,7 +63,7 @@ function showRegisterForm() {
 }
 
 // -------------------------
-// HOME / SETTINGS TAB
+// HOME / SETTINGS TABS
 // -------------------------
 function showTab(id) {
     document.querySelectorAll(".tab-content").forEach(el => {
@@ -80,18 +80,15 @@ function showTab(id) {
     }, 15);
 }
 
-// Show home page after login
 function showHome() {
     showTab("home-tab");
     document.getElementById("welcome-header").textContent = `Welcome To Child Apks, ${currentUser}`;
 }
 
-// Show settings page
 function showSettings() {
     showTab("settings-tab");
 }
 
-// Logout
 async function logout() {
     await fetch(`${apiBase}/logout`, {
         method: "POST",
@@ -102,7 +99,7 @@ async function logout() {
 }
 
 // -------------------------
-// PAIRED GAMES
+// PAIR GAME / PAIRED GAMES
 // -------------------------
 async function requestPairing() {
     const gameName = prompt("Enter your game's name:");
@@ -119,7 +116,7 @@ async function requestPairing() {
         if (!res.ok) return alert(data.error || "Failed to request pairing");
 
         alert("Send this pairing code to your Unity game: " + data.code);
-        loadPairedGames(); // refresh list
+        loadPairedGames();
     } catch (err) {
         console.error(err);
         alert("Server error");
@@ -176,5 +173,7 @@ async function checkAuth() {
     }
 }
 
-// Run checkAuth when the page loads
+// -------------------------
+// INITIALIZE
+// -------------------------
 window.addEventListener("load", checkAuth);
