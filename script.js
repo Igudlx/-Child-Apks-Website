@@ -12,12 +12,16 @@ window.onerror = function (msg, url, line) {
 window.addEventListener("DOMContentLoaded", () => {
   setupAuthTabs();
   setupAuthForms();
-  safeUpdateGreeting();
-  safeLoadGames();
+
+  // ONLY enforce login on home page
+  if (document.getElementById("greeting")) {
+    enforceHomeAuth();
+    loadGamesSafe();
+  }
 });
 
 /* ==========================
-   LOGIN / REGISTER TAB SWITCH
+   LOGIN / REGISTER TABS
 ========================== */
 function setupAuthTabs() {
   const loginTab = document.getElementById("login-tab");
@@ -39,7 +43,7 @@ function setupAuthTabs() {
 }
 
 /* ==========================
-   PREVENT FORM RELOADS
+   PREVENT FORM RELOAD
 ========================== */
 function setupAuthForms() {
   const loginForm = document.getElementById("login-form");
@@ -58,28 +62,6 @@ function setupAuthForms() {
       register();
     });
   }
-}
-
-/* ==========================
-   TAB SWITCH (HOME)
-========================== */
-function showTab(id) {
-  document.querySelectorAll(".tab-content").forEach(el => {
-    el.classList.add("hidden");
-    el.style.opacity = 0;
-  });
-
-  const tab = document.getElementById(id);
-  if (!tab) return;
-
-  tab.classList.remove("hidden");
-
-  let o = 0;
-  const fade = setInterval(() => {
-    o += 0.05;
-    tab.style.opacity = o;
-    if (o >= 1) clearInterval(fade);
-  }, 15);
 }
 
 /* ==========================
@@ -125,7 +107,9 @@ async function login() {
     }
 
     setCookie("user", data.username, 7);
-    window.location.href = "/home.html";
+
+    // HARD redirect after cookie is set
+    window.location.replace("/home.html");
   } catch (e) {
     console.error(e);
     alert("Server error");
@@ -157,7 +141,7 @@ async function register() {
     }
 
     setCookie("user", username, 7);
-    window.location.href = "/home.html";
+    window.location.replace("/home.html");
   } catch (e) {
     console.error(e);
     alert("Server error");
@@ -165,19 +149,42 @@ async function register() {
 }
 
 /* ==========================
-   GREETING
+   HOME AUTH + GREETING
 ========================== */
-function safeUpdateGreeting() {
-  const greeting = document.getElementById("greeting");
-  if (!greeting) return;
-
+function enforceHomeAuth() {
   const username = getCookie("user");
+
   if (!username) {
-    window.location.href = "/index.html";
+    window.location.replace("/index.html");
     return;
   }
 
-  greeting.textContent = `Welcome To Child Apks, ${username}`;
+  const greeting = document.getElementById("greeting");
+  if (greeting) {
+    greeting.textContent = `Welcome To Child Apks, ${username}`;
+  }
+}
+
+/* ==========================
+   TAB SWITCH (HOME)
+========================== */
+function showTab(id) {
+  document.querySelectorAll(".tab-content").forEach(el => {
+    el.classList.add("hidden");
+    el.style.opacity = 0;
+  });
+
+  const tab = document.getElementById(id);
+  if (!tab) return;
+
+  tab.classList.remove("hidden");
+
+  let o = 0;
+  const fade = setInterval(() => {
+    o += 0.05;
+    tab.style.opacity = o;
+    if (o >= 1) clearInterval(fade);
+  }, 15);
 }
 
 /* ==========================
@@ -213,7 +220,7 @@ async function pairGame() {
     }
 
     closePairModal();
-    safeLoadGames();
+    loadGamesSafe();
     alert("Game paired!");
   } catch (e) {
     console.error(e);
@@ -222,9 +229,9 @@ async function pairGame() {
 }
 
 /* ==========================
-   LOAD GAMES
+   LOAD GAMES (SAFE)
 ========================== */
-async function safeLoadGames() {
+async function loadGamesSafe() {
   const container = document.getElementById("games");
   if (!container) return;
 
@@ -283,7 +290,7 @@ async function updateUsername() {
     }
 
     setCookie("user", newUsername, 7);
-    safeUpdateGreeting();
+    enforceHomeAuth();
     alert("Username updated!");
   } catch (e) {
     console.error(e);
@@ -296,5 +303,5 @@ async function updateUsername() {
 ========================== */
 function logout() {
   eraseCookie("user");
-  window.location.href = "/index.html";
+  window.location.replace("/index.html");
 }
