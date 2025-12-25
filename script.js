@@ -1,28 +1,62 @@
 /* ==========================
+   GLOBAL ERROR GUARD
+   (prevents blank page)
+========================== */
+window.onerror = function (msg, url, line) {
+  console.error("JS ERROR:", msg, "Line:", line);
+  return false;
+};
+
+/* ==========================
    DOM READY
 ========================== */
 window.addEventListener("DOMContentLoaded", () => {
-  updateGreeting();
-  loadGames();
+  safeUpdateGreeting();
+  safeLoadGames();
+  setupAuthTabs();
 });
 
 /* ==========================
-   TAB SWITCH
+   AUTH TABS (LOGIN PAGE)
+========================== */
+function setupAuthTabs() {
+  const loginTab = document.getElementById("login-tab");
+  const registerTab = document.getElementById("register-tab");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+
+  if (!loginTab || !registerTab || !loginForm || !registerForm) return;
+
+  loginTab.onclick = () => {
+    loginForm.classList.remove("hidden");
+    registerForm.classList.add("hidden");
+  };
+
+  registerTab.onclick = () => {
+    registerForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
+  };
+}
+
+/* ==========================
+   TAB SWITCH (HOME)
 ========================== */
 function showTab(id) {
-  document.querySelectorAll(".tab-content").forEach(el => {
-    el.classList.add("hidden");
-    el.style.opacity = 0;
+  const tabs = document.querySelectorAll(".tab-content");
+  tabs.forEach(t => {
+    t.classList.add("hidden");
+    t.style.opacity = 0;
   });
 
   const tab = document.getElementById(id);
-  tab.classList.remove("hidden");
+  if (!tab) return;
 
-  let opacity = 0;
+  tab.classList.remove("hidden");
+  let o = 0;
   const fade = setInterval(() => {
-    opacity += 0.05;
-    tab.style.opacity = opacity;
-    if (opacity >= 1) clearInterval(fade);
+    o += 0.05;
+    tab.style.opacity = o;
+    if (o >= 1) clearInterval(fade);
   }, 15);
 }
 
@@ -30,25 +64,26 @@ function showTab(id) {
    COOKIE HELPERS
 ========================== */
 function getCookie(name) {
-  const v = document.cookie.match("(^|;) ?"+name+"=([^;]*)(;|$)");
+  const v = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
   return v ? v[2] : null;
 }
 
 function setCookie(name, value, days) {
-  document.cookie = `${name}=${value}; path=/; max-age=${days*86400}`;
+  document.cookie = `${name}=${value}; path=/; max-age=${days * 86400}`;
 }
 
 function eraseCookie(name) {
-  document.cookie = name + "=; Max-Age=0; path=/";
+  document.cookie = `${name}=; Max-Age=0; path=/`;
 }
 
 /* ==========================
-   GREETING
+   GREETING (SAFE)
 ========================== */
-function updateGreeting() {
-  const username = getCookie("user");
+function safeUpdateGreeting() {
   const greeting = document.getElementById("greeting");
+  if (!greeting) return;
 
+  const username = getCookie("user");
   if (!username) {
     window.location.href = "/index.html";
     return;
@@ -61,92 +96,116 @@ function updateGreeting() {
    PAIR MODAL
 ========================== */
 function openPairModal() {
-  document.getElementById("pairModal").classList.remove("hidden");
+  const modal = document.getElementById("pairModal");
+  if (modal) modal.classList.remove("hidden");
 }
 
 function closePairModal() {
-  document.getElementById("pairModal").classList.add("hidden");
+  const modal = document.getElementById("pairModal");
+  if (modal) modal.classList.add("hidden");
 }
 
 /* ==========================
    PAIR GAME
 ========================== */
 async function pairGame() {
-  const code = document.getElementById("pairCodeInput").value.trim();
+  const input = document.getElementById("pairCodeInput");
+  if (!input) return;
+
+  const code = input.value.trim();
   const username = getCookie("user");
 
-  if (!code) {
-    alert("Enter a code");
-    return;
-  }
+  if (!code) return alert("Enter a pairing code");
 
-  const res = await fetch("/api/pair-game", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ username, code })
-  });
+  try {
+    const res = await fetch("/api/pair-game", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, code })
+    });
 
-  if (res.ok) {
+    if (!res.ok) {
+      alert(await res.text());
+      return;
+    }
+
+    input.value = "";
     closePairModal();
-    document.getElementById("pairCodeInput").value = "";
-    loadGames();
+    safeLoadGames();
     alert("Game paired successfully!");
-  } else {
-    alert(await res.text());
+  } catch (e) {
+    console.error(e);
+    alert("Server error");
   }
 }
 
 /* ==========================
-   LOAD USER GAMES
+   LOAD GAMES (SAFE)
 ========================== */
-async function loadGames() {
-  const username = getCookie("user");
+async function safeLoadGames() {
   const container = document.getElementById("games");
-
   if (!container) return;
 
-  const res = await fetch(`/api/get-user-games?username=${username}`);
-  const games = await res.json();
+  const username = getCookie("user");
+  if (!username) return;
 
-  container.innerHTML = "";
+  try {
+    const res = await fetch(`/api/get-user-games?username=${username}`);
+    if (!res.ok) {
+      container.innerHTML = "<p>Error loading games</p>";
+      return;
+    }
 
-  if (games.length === 0) {
-    container.innerHTML = "<p>No games paired yet.</p>";
-    return;
+    const games = await res.json();
+    container.innerHTML = "";
+
+    if (!games.length) {
+      container.innerHTML = "<p>No games paired yet.</p>";
+      return;
+    }
+
+    games.forEach(g => {
+      const div = document.createElement("div");
+      div.className = "game-card";
+      div.textContent = g.game_name;
+      container.appendChild(div);
+    });
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = "<p>Failed to load games</p>";
   }
-
-  games.forEach(g => {
-    const card = document.createElement("div");
-    card.className = "game-card";
-    card.textContent = g.game_name;
-    container.appendChild(card);
-  });
 }
 
 /* ==========================
    UPDATE USERNAME
 ========================== */
 async function updateUsername() {
-  const newUsername = document.getElementById("new-username").value.trim();
+  const input = document.getElementById("new-username");
+  if (!input) return;
+
+  const newUsername = input.value.trim();
   const oldUsername = getCookie("user");
 
-  if (!newUsername) {
-    alert("Enter a username");
-    return;
-  }
+  if (!newUsername) return alert("Enter a username");
 
-  const res = await fetch("/api/update-username", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ oldUsername, newUsername })
-  });
+  try {
+    const res = await fetch("/api/update-username", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ oldUsername, newUsername })
+    });
 
-  if (res.ok) {
+    if (!res.ok) {
+      alert(await res.text());
+      return;
+    }
+
     setCookie("user", newUsername, 7);
-    updateGreeting();
+    safeUpdateGreeting();
     alert("Username updated!");
-  } else {
-    alert(await res.text());
+  } catch (e) {
+    console.error(e);
+    alert("Server error");
   }
 }
 
