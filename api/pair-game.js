@@ -1,24 +1,23 @@
 import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    try {
+        if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  try {
-    const body = await req.json();
-    const { code } = body;
+        const { code, game_name } = await req.json();
+        const username = req.cookies.user; // logged-in user
+        if (!username) return res.status(401).json({ error: "Not logged in" });
 
-    if (!code) return res.status(400).json({ error: 'Missing code' });
+        // Mark the pairing code as used and store the game name for the user
+        await sql`
+            UPDATE pairing_codes
+            SET used = true
+            WHERE code = ${code} AND username = ${username}
+        `;
 
-    // Replace this with your sessiocheck logic
-    const username = req.cookies.user || null;
-    if (!username) return res.status(401).json({ error: 'Not logged in' });
-
-    // Insert paired game into Neon
-    await sql`INSERT INTO paired_games (username, code) VALUES (${username}, ${code})`;
-
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Server error' });
-  }
+        res.status(200).json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
 }
