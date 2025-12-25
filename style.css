@@ -2,25 +2,23 @@ body {
   background: #0b0b0b;
   color: #ff2a2a;
   font-family: monospace;
-  display: flex;
-  gap: 40px;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  margin: 0;
 }
 
-.box {
+.auth-container, .tab-content {
   background: #111;
-  padding: 25px;
   border: 1px solid #ff2a2a;
-  width: 260px;
+  padding: 20px;
+  margin: 50px auto;
+  width: 300px;
   text-align: center;
+  border-radius: 8px;
 }
 
 input {
   width: 100%;
-  padding: 8px;
   margin: 8px 0;
+  padding: 8px;
   background: black;
   color: red;
   border: 1px solid red;
@@ -29,13 +27,27 @@ input {
 button {
   width: 100%;
   padding: 10px;
+  margin-top: 10px;
   background: red;
   color: black;
   border: none;
   cursor: pointer;
 }
 
-.logo {
-  width: 120px;
-  margin-bottom: 10px;
+.hidden { display: none; }
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  background: #111;
+  padding: 10px 20px;
+  border-bottom: 1px solid red;
 }
+
+nav button {
+  width: auto;
+  padding: 5px 15px;
+  margin-left: 5px;
+}
+
+.logo { width: 120px; margin-bottom: 20px; }
