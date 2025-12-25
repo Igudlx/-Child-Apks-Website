@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Child Apks - Login</title>
-<link rel="stylesheet" href="style.css">
-<script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <title>Child Apks — Login</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="auth-container">
-    <img src="images/childapkslogo.gif" class="logo" alt="Child Apks Logo">
 
-    <div class="tab">
-      <button id="login-tab">Login</button>
-      <button id="register-tab">Register</button>
-    </div>
+<div class="auth-container">
+  <img src="images/logo.png" class="logo" />
 
-    <div id="login-form" class="form">
-      <input id="login-username" placeholder="Username">
-      <input id="login-password" type="password" placeholder="Password">
-      <button onclick="login()">Login</button>
-    </div>
-
-    <div id="register-form" class="form hidden">
-      <input id="register-username" placeholder="Username">
-      <input id="register-password" type="password" placeholder="Password">
-      <button onclick="register()">Register</button>
-    </div>
-
-    <pre id="output"></pre>
+  <div class="auth-switch">
+    <button onclick="showAuthTab('login-tab')">Login</button>
+    <button onclick="showAuthTab('register-tab')">Register</button>
   </div>
+
+  <div id="login-tab" class="auth-tab">
+    <input id="login-username" placeholder="Username" />
+    <input id="login-password" type="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="register-tab" class="auth-tab hidden">
+    <input id="register-username" placeholder="Username" />
+    <input id="register-password" type="password" placeholder="Password" />
+    <button onclick="register()">Register</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
