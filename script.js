@@ -1,6 +1,5 @@
 /* ==========================
    GLOBAL ERROR GUARD
-   (prevents blank page)
 ========================== */
 window.onerror = function (msg, url, line) {
   console.error("JS ERROR:", msg, "Line:", line);
@@ -11,13 +10,14 @@ window.onerror = function (msg, url, line) {
    DOM READY
 ========================== */
 window.addEventListener("DOMContentLoaded", () => {
+  setupAuthTabs();
+  setupAuthForms();
   safeUpdateGreeting();
   safeLoadGames();
-  setupAuthTabs();
 });
 
 /* ==========================
-   AUTH TABS (LOGIN PAGE)
+   LOGIN / REGISTER TAB SWITCH
 ========================== */
 function setupAuthTabs() {
   const loginTab = document.getElementById("login-tab");
@@ -39,19 +39,41 @@ function setupAuthTabs() {
 }
 
 /* ==========================
+   PREVENT FORM RELOADS
+========================== */
+function setupAuthForms() {
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", e => {
+      e.preventDefault();
+      login();
+    });
+  }
+
+  if (registerForm) {
+    registerForm.addEventListener("submit", e => {
+      e.preventDefault();
+      register();
+    });
+  }
+}
+
+/* ==========================
    TAB SWITCH (HOME)
 ========================== */
 function showTab(id) {
-  const tabs = document.querySelectorAll(".tab-content");
-  tabs.forEach(t => {
-    t.classList.add("hidden");
-    t.style.opacity = 0;
+  document.querySelectorAll(".tab-content").forEach(el => {
+    el.classList.add("hidden");
+    el.style.opacity = 0;
   });
 
   const tab = document.getElementById(id);
   if (!tab) return;
 
   tab.classList.remove("hidden");
+
   let o = 0;
   const fade = setInterval(() => {
     o += 0.05;
@@ -77,7 +99,73 @@ function eraseCookie(name) {
 }
 
 /* ==========================
-   GREETING (SAFE)
+   LOGIN
+========================== */
+async function login() {
+  const username = document.getElementById("login-username")?.value.trim();
+  const password = document.getElementById("login-password")?.value;
+
+  if (!username || !password) {
+    alert("Enter username and password");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Login failed");
+      return;
+    }
+
+    setCookie("user", data.username, 7);
+    window.location.href = "/home.html";
+  } catch (e) {
+    console.error(e);
+    alert("Server error");
+  }
+}
+
+/* ==========================
+   REGISTER
+========================== */
+async function register() {
+  const username = document.getElementById("register-username")?.value.trim();
+  const password = document.getElementById("register-password")?.value;
+
+  if (!username || !password) {
+    alert("Enter username and password");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (!res.ok) {
+      alert(await res.text());
+      return;
+    }
+
+    setCookie("user", username, 7);
+    window.location.href = "/home.html";
+  } catch (e) {
+    console.error(e);
+    alert("Server error");
+  }
+}
+
+/* ==========================
+   GREETING
 ========================== */
 function safeUpdateGreeting() {
   const greeting = document.getElementById("greeting");
@@ -96,26 +184,21 @@ function safeUpdateGreeting() {
    PAIR MODAL
 ========================== */
 function openPairModal() {
-  const modal = document.getElementById("pairModal");
-  if (modal) modal.classList.remove("hidden");
+  document.getElementById("pairModal")?.classList.remove("hidden");
 }
 
 function closePairModal() {
-  const modal = document.getElementById("pairModal");
-  if (modal) modal.classList.add("hidden");
+  document.getElementById("pairModal")?.classList.add("hidden");
 }
 
 /* ==========================
    PAIR GAME
 ========================== */
 async function pairGame() {
-  const input = document.getElementById("pairCodeInput");
-  if (!input) return;
-
-  const code = input.value.trim();
+  const code = document.getElementById("pairCodeInput")?.value.trim();
   const username = getCookie("user");
 
-  if (!code) return alert("Enter a pairing code");
+  if (!code) return alert("Enter a code");
 
   try {
     const res = await fetch("/api/pair-game", {
@@ -129,10 +212,9 @@ async function pairGame() {
       return;
     }
 
-    input.value = "";
     closePairModal();
     safeLoadGames();
-    alert("Game paired successfully!");
+    alert("Game paired!");
   } catch (e) {
     console.error(e);
     alert("Server error");
@@ -140,7 +222,7 @@ async function pairGame() {
 }
 
 /* ==========================
-   LOAD GAMES (SAFE)
+   LOAD GAMES
 ========================== */
 async function safeLoadGames() {
   const container = document.getElementById("games");
