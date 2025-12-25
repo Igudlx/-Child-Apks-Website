@@ -1,28 +1,24 @@
-import { sql } from "@vercel/postgres";
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { username, code } = req.body;
+  try {
+    const body = await req.json();
+    const { code } = body;
 
-  const result = await sql`
-    SELECT * FROM pair_codes WHERE code=${code}
-  `;
+    if (!code) return res.status(400).json({ error: 'Missing code' });
 
-  if (result.rowCount === 0) {
-    return res.status(400).send("Invalid or expired code");
+    // Replace this with your session check logic
+    const username = req.cookies.user || null;
+    if (!username) return res.status(401).json({ error: 'Not logged in' });
+
+    // Insert paired game into Neon
+    await sql`INSERT INTO paired_games (username, code) VALUES (${username}, ${code})`;
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Server error' });
   }
-
-  const gameName = result.rows[0].game_name;
-
-  await sql`
-    INSERT INTO user_games (username, game_name)
-    VALUES (${username}, ${gameName})
-  `;
-
-  await sql`
-    DELETE FROM pair_codes WHERE code=${code}
-  `;
-
-  res.send("Game paired!");
 }
