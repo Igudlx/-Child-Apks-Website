@@ -19,14 +19,14 @@ function showTab(id) {
 /* ==========================
    LOGIN PAGE TAB SWITCH
 ========================== */
-document.getElementById('login-tab').onclick = () => {
+document.getElementById('login-tab')?.addEventListener('click', () => {
   document.getElementById('login-form').classList.remove('hidden');
   document.getElementById('register-form').classList.add('hidden');
-}
-document.getElementById('register-tab').onclick = () => {
+});
+document.getElementById('register-tab')?.addEventListener('click', () => {
   document.getElementById('login-form').classList.add('hidden');
   document.getElementById('register-form').classList.remove('hidden');
-}
+});
 
 /* ==========================
    COOKIE HELPERS
@@ -46,36 +46,43 @@ function eraseCookie(name) {
    CHECK IF USER ALREADY LOGGED IN
 ========================== */
 window.onload = () => {
-  const user = getCookie('user');
-  if (user && window.location.pathname.includes('index.html')) {
+  const username = getCookie('user');
+  if (username && window.location.pathname.includes('index.html')) {
     window.location.href = '/home.html';
   }
 
   // Set greeting if on home page
-  if (user && document.getElementById('greeting')) {
-    document.getElementById('greeting').textContent = `Hello ${user}. Welcome To Child Apks`;
+  if (username && document.getElementById('greeting')) {
+    document.getElementById('greeting').textContent = `Welcome To Child Apks, ${username}`;
   }
-}
+};
 
 /* ==========================
    REGISTER FUNCTION
 ========================== */
 async function register() {
-  const username = document.getElementById('register-username').value;
+  const username = document.getElementById('register-username').value.trim();
   const password = document.getElementById('register-password').value;
 
-  const res = await fetch('/api/register', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({username, password})
-  });
+  if (!username || !password) return alert("Enter a valid username and password");
 
-  const text = await res.text();
-  document.getElementById('output').textContent = text;
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username, password})
+    });
 
-  if (res.ok) {
-    setCookie('user', username, 7);
-    window.location.href = '/home.html';
+    const text = await res.text();
+    document.getElementById('output').textContent = text;
+
+    if (res.ok) {
+      setCookie('user', username, 7);
+      window.location.href = '/home.html';
+    }
+  } catch (err) {
+    console.error(err);
+    document.getElementById('output').textContent = "Server error";
   }
 }
 
@@ -83,22 +90,29 @@ async function register() {
    LOGIN FUNCTION
 ========================== */
 async function login() {
-  const username = document.getElementById('login-username').value;
+  const username = document.getElementById('login-username').value.trim();
   const password = document.getElementById('login-password').value;
 
-  const res = await fetch('/api/login', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({username, password})
-  });
+  if (!username || !password) return alert("Enter a valid username and password");
 
-  const data = await res.json().catch(() => ({error:true}));
+  try {
+    const res = await fetch('/api/login', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username, password})
+    });
 
-  if (res.ok) {
-    setCookie('user', data.username, 7);
-    window.location.href = '/home.html';
-  } else {
-    document.getElementById('output').textContent = await res.text();
+    const data = await res.json().catch(() => ({error:true}));
+
+    if (res.ok) {
+      setCookie('user', data.username, 7);
+      window.location.href = '/home.html';
+    } else {
+      document.getElementById('output').textContent = data.error || "Login failed";
+    }
+  } catch(err) {
+    console.error(err);
+    document.getElementById('output').textContent = "Server error";
   }
 }
 
@@ -106,7 +120,9 @@ async function login() {
    LOGOUT FUNCTION
 ========================== */
 async function logout() {
-  await fetch('/api/logout');
+  try {
+    await fetch('/api/logout');
+  } catch(err) { console.error(err); }
   eraseCookie('user');
   window.location.href = '/index.html';
 }
@@ -120,19 +136,22 @@ async function updateUsername() {
 
   if (!newUsername) return alert("Enter a valid username");
 
-  const res = await fetch('/api/update-username', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({oldUsername, newUsername})
-  });
+  try {
+    const res = await fetch('/api/update-username', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({oldUsername, newUsername})
+    });
 
-  const data = await res.json().catch(() => ({error:true}));
-
-  if (res.ok) {
-    setCookie('user', newUsername, 7);
-    document.getElementById('greeting').textContent = `Hello ${newUsername}. Welcome To Child Apks`;
-    alert('Username updated!');
-  } else {
-    alert(await res.text());
+    if (res.ok) {
+      setCookie('user', newUsername, 7);
+      document.getElementById('greeting').textContent = `Welcome To Child Apks, ${newUsername}`;
+      alert('Username updated!');
+    } else {
+      alert(await res.text());
+    }
+  } catch(err) {
+    console.error(err);
+    alert("Server error");
   }
 }
